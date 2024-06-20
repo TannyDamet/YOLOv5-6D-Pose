@@ -89,8 +89,6 @@ def test(data, weights=None, batch_size=1,
     errs_2d              = []
     errs_3d              = []
     errs_trans           = []
-    dist                = []
-    errs_trans_percent  = [] 
     errs_angle           = []
     errs_corner2D        = []
 
@@ -225,17 +223,11 @@ def test(data, weights=None, batch_size=1,
                     R_pr, t_pr = pnp(np.array(np.transpose(np.concatenate((np.zeros((3, 1)), corners3D[:3, :]), axis=1)), dtype='float32'),  corners2D_pr, np.array(internal_calibration, dtype='float32'))
                     t6.append(time_synchronized() - t_temp)
 
-                    d = np.linalg.norm(t_gt)
-                    dist.append(d)
-                    
                     # Compute errors
                     # Compute translation error
                     trans_dist   = np.sqrt(np.sum(np.square(t_gt - t_pr)))
                     errs_trans.append(trans_dist)
 
-                    trans_dist_percent = (trans_dist / d) * 100
-                    errs_trans_percent.append(trans_dist_percent)
-                       
                     # Compute angle error
                     angle_dist   = calcAngularDistance(R_gt, R_pr)
                     errs_angle.append(angle_dist)
@@ -300,6 +292,7 @@ def test(data, weights=None, batch_size=1,
                         # facecolor = 'green' if vertex_dist <=vx_threshold else 'red'
                         # ax.text(min_x, min_y-30, f"conf: {prediction_confidence:.3f}", style='italic', bbox={'facecolor': facecolor, 'alpha': 0.5, 'pad': 2})
                         # ax.text(min_x, min_y-10, f"2d err: {pixel_dist:.3f}, vertex_dist: {vertex_dist:.3f}", style='italic', bbox={'facecolor': facecolor, 'alpha': 0.5, 'pad': 2})
+                        
 
                         filename = f'foo_{count}_{datetime.now().strftime("%H_%M_%S")}.png'
                         file_path = os.path.join(save_dir, filename)
@@ -318,7 +311,7 @@ def test(data, weights=None, batch_size=1,
     acc          = acc_value * 100. / (len(errs_2d)+eps) 
     acc3d_value  = len(np.where(np.array(errs_3d) <= vx_threshold)[0]) 
     acc3d        = acc3d_value * 100. / (len(errs_3d)+eps) 
-    acc5cm5deg_value   = len(np.where((np.array(errs_trans) <= 0.15) & (np.array(errs_angle) <= 15))[0]) 
+    acc5cm5deg_value   = len(np.where((np.array(errs_trans) <= 0.05) & (np.array(errs_angle) <= 5))[0]) 
     acc5cm5deg   = acc5cm5deg_value* 100. / (len(errs_trans)+eps)
     corner_acc   = len(np.where(np.array(errs_corner2D) <= px_threshold)[0]) * 100. / (len(errs_corner2D)+eps)
     mean_err_2d  = np.mean(errs_2d)
@@ -348,7 +341,7 @@ def test(data, weights=None, batch_size=1,
     print("   Mean corner error is %f" % (mean_corner_err_2d))
     print('   Acc using {} px 2D Projection = {:.2f}%'.format(px_threshold, acc))
     print('   Acc using {} vx 3D Transformation = {:.2f}%'.format(vx_threshold, acc3d))
-    print('   Acc using 15 cm 15 degree metric = {:.2f}%'.format(acc5cm5deg))
+    print('   Acc using 5 cm 5 degree metric = {:.2f}%'.format(acc5cm5deg))
     print('   Translation error: %f, angle error: %f' % (testing_error_trans/(nts+eps), testing_error_angle/(nts+eps)) )
 
     # Register losses and errors for saving later on
@@ -356,60 +349,6 @@ def test(data, weights=None, batch_size=1,
     testing_errors_angle.append(testing_error_angle/(nts+eps))
     testing_errors_pixel.append(testing_error_pixel/(nts+eps))
     testing_accuracies.append(acc)
-
-    file_to = "diff_error_translation.txt"
-    file = open(file_to, 'a')
-    file.write("blue"+" : ")
-    for err in errs_trans:
-        file.write(str(err)+" ")
-    file.write("\n")
-    file.close()
-    
-    # Tanny part
-    file_to = "diff_error_translation_%.txt"
-    file = open(file_to, 'a')
-    file.write("blue"+" : ")
-    for err in errs_trans_percent:
-        file.write(str(err)+" ")
-    file.write("\n")
-    file.close()
-    
-    file_to = "diff_error_rotation.txt"
-    file = open(file_to, 'a')
-    file.write("blue"+" : ")
-    for err in errs_angle:
-        file.write(str(err)+" ")
-    file.write("\n")
-    file.close()
-    
-     
-    file_to = "diff_error_pixel.txt"
-    file = open(file_to, 'a')
-    file.write("blue"+" : ")
-    for err in errs_2d:
-        file.write(str(err)+" ")
-    file.write("\n")
-    file.close()
-    
-    file_to = "record_all_metrics.txt"
-    file = open(file_to, 'a')
-    file.write("\n")
-    file.write("blue")
-    file.write("\n")
-    file.write("2D 5pix Accuracy :  "+str(round(acc)/100))
-    file.write("\n")
-    file.write("5cm/5deg Accuracy :  "+str(round(acc5cm5deg)/100))
-    file.write("\n")
-    file.write("3D 10%/ diameter Accuracy :  "+str(round(acc3d)/100))
-    file.write("\n")
-    file.write("Mean Translation error :  "+str(testing_error_trans/nts)+" meter")
-    file.write("\n")
-    file.write("Mean Angle error :  "+str( testing_error_angle/nts)+" degree")
-    file.write("\n")
-    file.write("Mean 2D pixel error :  "+str(mean_err_2d)+" pix")
-    file.write("\n")
-    file.close()
-    
     # Return results
     model.float()  # for training
 

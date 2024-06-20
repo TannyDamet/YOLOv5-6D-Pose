@@ -544,11 +544,9 @@ class LoadImagesAndLabelsPose(Dataset):  # for training/testing
         cache.pop('version')  # remove version
 
         labels, masks, shapes = zip(*cache.values())
-        #print(masks)
-        
+
         self.labels = list(labels)
         self.masks = list(masks)
-        #print(self.masks)
         self.shapes = np.array(shapes, dtype=np.float64)
  
         self.img_files = list(cache.keys())  # update
@@ -574,9 +572,7 @@ class LoadImagesAndLabelsPose(Dataset):  # for training/testing
             self.img_files = [self.img_files[i] for i in irect]
             self.label_files = [self.label_files[i] for i in irect]
             self.labels = [self.labels[i] for i in irect]
-            
             self.masks = [self.masks[i] for i in irect]
-            #print(self.masks)
             self.shapes = s[irect]  # wh
             ar = ar[irect]
 
@@ -687,13 +683,9 @@ class LoadImagesAndLabelsPose(Dataset):  # for training/testing
         img2 = img
 
         # Augment background
-        if self.augment:
-            
-            #mask = cv2.imread(self.masks[index])
-
+        if self.augment: 
+            mask = cv2.imread(self.masks[index])
             if hyp['background'] and self.bg_file_names is not None and self.masks[index] != None:
-                    
-                    mask = cv2.imread(self.masks[index])
 
                     if random.random() < hyp['background']:
                         # Get background image path

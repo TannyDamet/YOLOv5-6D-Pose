@@ -1,0 +1,22 @@
+# train and val data as 1) directory: path/images/, 2) file: path/images.txt, or 3) list: [path1/images/, path2/images/]
+train: ../data/LINEMOD/blue/train.txt 
+val: ../data/LINEMOD/blue/test.txt 
+test: ../data/LINEMOD/blue/test.txt 
+
+mesh: ../data/LINEMOD/blue/blue.ply
+tr_range: ../data/LINEMOD/blue/training_range.txt
+backup : ../backup/LINEMOD/blue
+names : ["blue"]
+
+#background_path: "../data/VOCdevkit/VOC2012/JPEGImages"
+coords: 18
+
+diam : 0.4
+gpus : 0
+
+nc: 1  # number of classes
+
+fx: 570.2067
+fy: 571.7008
+u0: 320.0
+v0: 240.0

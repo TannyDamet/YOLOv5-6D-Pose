@@ -4,7 +4,8 @@ import numpy as np
 def convert_linemod_to_new_format(path_to_linemod):
 # recursively step through all labels and append camera intrinsics to each label
 
-    linemod_dict = {'fx': 572.4114, 'fy': 573.5704, 'u0': 325.2611, 'v0': 242.0489, 'width': 640, 'height': 480} 
+    #linemod_dict = {'fx': 572.4114, 'fy': 573.5704, 'u0': 325.2611, 'v0': 242.0489, 'width': 640, 'height': 480} 
+    linemod_dict = {'fx': 570.2067, 'fy': 571.7008, 'u0': 320.0, 'v0': 240.0, 'width': 640, 'height': 480} 
 
     for root, dirs, files in os.walk(path_to_linemod):
         for file in files:
